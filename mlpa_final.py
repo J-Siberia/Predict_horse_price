@@ -176,28 +176,33 @@ new_data.to_csv(predicted_csv_file_path, index=False)
 print(f"Predictions saved to {predicted_csv_file_path}")
 
 # CSVファイルのパスと読み込み
+predicted_csv_file_path = './predicted_data.csv'
 plt_data = pd.read_csv(predicted_csv_file_path)
 # 表示する画像数
 num_images = len(plt_data)
-
 # 画像の表示設定
 fig, axes = plt.subplots(nrows=1, ncols=num_images, figsize=(20, 5))
-
 # 画像の読み込みと表示
 for i in range(num_images):
     img_path = plt_data.iloc[i, 1]  # 2列目の画像パス
     img_path = img_path.lstrip('/')
     img_path = img_path.replace('/', '\\')
     img = Image.open(img_path)
-    axes[i].imshow(img)
+    # リサイズしたい高さ
+    new_height = 1200
+    # 元のアスペクト比を保ったまま高さをリサイズ
+    width_percent = (new_height / float(img.size[1]))
+    new_width = int((float(img.size[0]) * float(width_percent)))
+    resized_img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+    axes[i].imshow(resized_img)
     axes[i].axis('off')  # 軸を非表示にする
 
     text5 = plt_data.iloc[i, 4]  # 5列目の要素
     text8 = plt_data.iloc[i, 7]  # 8列目の要素
     error = abs(text5 - text8)
-    axes[i].text(0, img.height + 200, f'Price: {text5}', fontsize=12, ha='left')
-    axes[i].text(0, img.height + 500, f'Predict: {text8}', fontsize=12, ha='left')
-    axes[i].text(0, img.height + 800, f'Error: {error}', fontsize=12, ha='left')
+    axes[i].text(0, 1400, f'Price: {text5}', fontsize=12, ha='left')
+    axes[i].text(0, 1550, f'Predict: {text8}', fontsize=12, ha='left')
+    axes[i].text(0, 1700, f'Error: {error}', fontsize=12, ha='left')
 
 plt.tight_layout()
 plt.show()
